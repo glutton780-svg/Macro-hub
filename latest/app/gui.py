@@ -76,7 +76,19 @@ class App:
         )
         self.prev_loop = macros.PrevServerLoop()
         self.screenshot = ScreenshotManager(self._on_screenshot_update, data_dir())
-        self.window = None
+        # Leading underscore is load-bearing: pywebview's inject_pywebview()
+        # reflectively walks every public (non "_"-prefixed) attribute of
+        # this App instance to build the JS bridge, recursing into any
+        # non-callable object it finds. A plain `self.window` used to get
+        # walked straight into `window.native` - the raw WinForms/WebView2
+        # object graph - which has real cycles (Font.Style Bold/Regular,
+        # AccessibilityObject.Bounds) that pywebview's id()-based cycle
+        # guard can't catch (pythonnet hands back a fresh wrapper, and
+        # thus a new id(), on every property access), causing runaway
+        # recursion, plus off-UI-thread COM access on WebView2Controller
+        # members (that reflection walk runs on a background thread).
+        # Keeping this private keeps pywebview from ever touching it.
+        self._window = None
 
         # DOM updates from background threads (screenshot loop, hotkey
         # capture thread, spam/join/prev macro loops) must never call
@@ -191,12 +203,14 @@ class App:
             threading.Thread(target=self._do_check_update, args=(True,), daemon=True).start()
         elif action == "applyupdate":
             threading.Thread(target=self._do_apply_update, daemon=True).start()
+        elif action == "startdrag":
+            wu.start_window_drag("Roblox Macro Suite")
         elif action == "minimize":
-            if self.window:
-                self.window.minimize()
+            if self._window:
+                self._window.minimize()
         elif action == "exit":
-            if self.window:
-                self.window.destroy()
+            if self._window:
+                self._window.destroy()
 
     # ------------------------------------------------------------------
     # DOM push helpers (replace SetVal / SetHtml / SetChecked)

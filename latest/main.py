@@ -67,7 +67,7 @@ def main():
         frameless=True,
         easy_drag=False,  # dragging is handled by the .pywebview-drag-region titlebar div instead
     )
-    app.window = window
+    app._window = window
 
     try:
         webview.start(app.on_window_created, private_mode=False)

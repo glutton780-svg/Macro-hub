@@ -374,7 +374,7 @@
 </style>
 </head>
 <body>
-<div id="titlebar" class="pywebview-drag-region">
+<div id="titlebar" onmousedown="startTitlebarDrag(event)">
   <div id="titlebar-title">Roblox Macro Suite</div>
   <div id="titlebar-btns">
     <div class="titlebar-btn" onclick="nav('ahk://minimize')" title="Minimize">
@@ -684,6 +684,18 @@
 
 <script>
 function val(id) { return document.getElementById(id).value; }
+/* Frameless window dragging - handed off to Windows itself (see
+   wu.start_window_drag) instead of pywebview's built-in
+   .pywebview-drag-region handling, which was recursing into a native
+   accessibility property chain on every mouse-move and making dragging
+   laggy (see debug log). Only fires for left-click directly on the
+   titlebar/title text, not on the minimize/close buttons. */
+function startTitlebarDrag(e) {
+  if (e.button !== 0) return;
+  if (e.target.closest('.titlebar-btn')) return;
+  nav('ahk://startdrag');
+}
+
 function enc(s) { return encodeURIComponent(s).replace(/%20/g, '+'); }
 
 /* Every button/input in this page calls nav('ahk://action?k=v&k2=v2') -

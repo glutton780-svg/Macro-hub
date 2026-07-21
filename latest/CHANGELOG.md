@@ -4,6 +4,21 @@ All notable changes to Roblox Macro Suite are logged here, most recent first.
 
 ## Unreleased
 
+### Fixed
+- Frameless window dragging (the custom titlebar) was choppy and spammed
+  the console with repeated `[pywebview] Error while processing
+  window.native.AccessibilityObject.Bounds.Empty.Empty...: maximum
+  recursion depth exceeded` - pywebview's built-in `.pywebview-drag-region`
+  handling on this WebView2/WinForms build polls native window/
+  accessibility properties on every mouse-move during a drag, and that
+  polling was recursing infinitely. Replaced it with a native OS-driven
+  drag (`wu.start_window_drag` sends `WM_NCLBUTTONDOWN`/`HTCAPTION` to the
+  window once on mousedown, same trick every frameless-window app uses),
+  so Windows runs the whole drag itself with no per-frame polling.
+  `gui_template.html`'s titlebar no longer uses the `pywebview-drag-region`
+  class; dragging goes through `startTitlebarDrag()` -> the new
+  `startdrag` action in `app/gui.py`.
+
 ### Added
 - Self-updater, ported over from the old GUI.ahk build's
   `uploader.ps1`/`downloader.ps1`:

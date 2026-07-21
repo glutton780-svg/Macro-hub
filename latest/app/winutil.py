@@ -11,6 +11,8 @@ AHK's Send/Click/ControlClick are what Roblox reliably accepts.
 Requires: pywin32, psutil (see requirements.txt) + AutoHotkey installed
 (see ahk_bridge.py for AHK_EXE).
 """
+import ctypes
+
 import psutil
 import win32gui
 import win32process
@@ -35,6 +37,58 @@ def foreground_exe_name():
 
 def is_roblox_active():
     return foreground_exe_name().lower() == config.ROBLOX_EXE.lower()
+
+
+# ---------------------------------------------------------------------------
+# Native window drag - replaces pywebview's built-in .pywebview-drag-region
+# handling, which on this WebView2 build recurses into a native
+# AccessibilityObject/Bounds property chain on every mouse-move during a
+# drag (visible in the log as repeated "maximum recursion depth exceeded"
+# [pywebview] errors) and makes moving the window laggy.
+#
+# This does the same thing every standard frameless-window app does: tell
+# Windows the mouse went down on the title bar (HTCAPTION) and let the OS
+# run its own native drag loop. One call at mousedown, zero per-frame
+# polling - see gui_template.html's titlebar mousedown handler.
+# ---------------------------------------------------------------------------
+_WM_NCLBUTTONDOWN = 0x00A1
+_HTCAPTION = 2
+
+_user32 = ctypes.windll.user32
+
+
+def start_window_drag(window_title):
+    hwnd = win32gui.FindWindow(None, window_title)
+    if not hwnd:
+        return
+
+    # pywebview dispatches every js_api call (including this one, via the
+    # "startdrag" nav() command) on a throwaway Thread it spawns per-call
+    # (see pywebview's util.js_bridge_call), NOT the UI thread that owns
+    # the window and its real mouse capture. ReleaseCapture() only ever
+    # releases capture for the CALLING thread, so calling it here used to
+    # be a silent no-op - it never touched the UI thread's actual capture,
+    # so the WM_NCLBUTTONDOWN/HTCAPTION message below had nothing to grab
+    # onto and the drag never started (no error, no log line - it just
+    # did nothing, which is why this looked like it "stopped working").
+    #
+    # AttachThreadInput temporarily shares input state (capture, focus,
+    # active window) between this thread and the window's real UI thread,
+    # so ReleaseCapture() here actually reaches the right capture before
+    # we hand off to the native NC drag loop.
+    current_thread_id = ctypes.windll.kernel32.GetCurrentThreadId()
+    target_thread_id, _ = win32process.GetWindowThreadProcessId(hwnd)
+
+    attached = False
+    if target_thread_id != current_thread_id:
+        attached = bool(_user32.AttachThreadInput(current_thread_id, target_thread_id, True))
+
+    try:
+        _user32.ReleaseCapture()
+        _user32.SendMessageW(hwnd, _WM_NCLBUTTONDOWN, _HTCAPTION, 0)
+    finally:
+        if attached:
+            _user32.AttachThreadInput(current_thread_id, target_thread_id, False)
 
 
 # ---------------------------------------------------------------------------
