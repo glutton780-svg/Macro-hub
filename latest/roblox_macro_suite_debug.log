@@ -1,0 +1,12 @@
+2026-07-21T22:21:48.224  [main]  app starting
+2026-07-21T22:21:48.226  [main]  not admin - relaunching elevated
+2026-07-21T22:21:50.056  [main]  app starting
+2026-07-21T22:21:50.059  [ahk_bridge]  starting worker: AHK_EXE=C:\Program Files\AutoHotkey\AutoHotkey.exe WORKER_SCRIPT=C:\Users\ellio\OneDrive\Desktop\MACRO WORK\roblox_macro_suite\ahk\macro_worker.ahk
+2026-07-21T22:21:50.118  [ahk_bridge]  worker running OK, pid=27320 hwnd=397992
+2026-07-21T22:21:50.121  [settings]  load_settings: loaded from C:\Users\ellio\OneDrive\Desktop\MACRO WORK\roblox_macro_suite\settings.json
+2026-07-21 22:21:50  [macro_worker.ahk]  worker starting, pid=27320
+2026-07-21T22:21:50.792  [gui]  on_window_created: rebinding hotkeys and starting screenshot loop
+2026-07-21T22:21:50.794  [screenshot]  set_enabled(True)
+2026-07-21T22:21:50.800  [screenshot]  start (polling C:\Users\ellio\OneDrive\Desktop\MACRO WORK\roblox_macro_suite\server_capture.png)
+2026-07-21T22:21:51.281  [updater]  check_for_update: failed to fetch/parse manifest.json: HTTP Error 404: Not Found
+2026-07-21 22:22:06  [macro_worker.ahk]  parent process (pid=26976) gone - exiting

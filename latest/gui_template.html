@@ -19,9 +19,53 @@
   #app {
     display: -ms-flexbox;
     display: flex;
-    height: 100vh;
+    height: calc(100vh - 32px);
     width: 100vw;
   }
+
+  /* ===== Custom titlebar (replaces the native OS titlebar - window is
+     created frameless, so this is the only window chrome there is) ===== */
+  #titlebar {
+    height: 32px;
+    width: 100vw;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    background-color: #0c0d10;
+    border-bottom: 1px solid #1c1e24;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  #titlebar-title {
+    padding-left: 12px;
+    font-size: 12px;
+    color: #9aa0ac;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+  }
+  #titlebar-btns {
+    display: -ms-flexbox;
+    display: flex;
+    height: 100%;
+  }
+  .titlebar-btn {
+    width: 44px;
+    height: 100%;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #9aa0ac;
+  }
+  .titlebar-btn:hover { background-color: #1d2029; color: #f2f3f5; }
+  .titlebar-btn.close-btn:hover { background-color: #c0392b; color: #fff; }
+  .titlebar-btn svg { -ms-flex-negative: 0; flex-shrink: 0; }
 
   /* ===== Sidebar ===== */
   #sidebar {
@@ -330,6 +374,24 @@
 </style>
 </head>
 <body>
+<div id="titlebar" class="pywebview-drag-region">
+  <div id="titlebar-title">Roblox Macro Suite</div>
+  <div id="titlebar-btns">
+    <div class="titlebar-btn" onclick="nav('ahk://minimize')" title="Minimize">
+      <svg width="10" height="10" viewBox="0 0 10 10"><rect x="0" y="4.5" width="10" height="1" fill="currentColor"/></svg>
+    </div>
+    <div class="titlebar-btn close-btn" onclick="nav('ahk://exit')" title="Close">
+      <svg width="10" height="10" viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="currentColor" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="currentColor" stroke-width="1"/></svg>
+    </div>
+  </div>
+</div>
+<div id="UpdateBanner" style="display:none; align-items:center; justify-content:space-between; gap:12px; padding:8px 16px; background-color:#1e212b; border-bottom:1px solid #3d6bff; width:100vw; box-sizing:border-box;">
+  <span id="UpdateBannerText" style="color:#e8eaed;">Update available.</span>
+  <span style="display:flex; gap:8px; flex-shrink:0;">
+    <button class="btn btn-primary" style="padding:4px 12px;" onclick="nav('ahk://applyupdate')">Update Now</button>
+    <button class="btn" style="padding:4px 12px;" onclick="document.getElementById('UpdateBanner').style.display='none'">Dismiss</button>
+  </span>
+</div>
 <div id="app">
 
   <!-- ===== Sidebar ===== -->
@@ -356,8 +418,8 @@
     </nav>
     <div class="sidebar-spacer"></div>
     <div class="sidebar-footer">
-      VERSION-RMS1<br>
-      Live: false
+      Version __LOCAL_VERSION__<br>
+      <a href="#" onclick="nav('ahk://checkupdate'); return false;" style="color:#5b8cff; text-decoration:none;">Check for updates</a>
     </div>
   </div>
 
@@ -487,10 +549,6 @@
           <input type="text" id="ClickTriggerKeyInput" value="__CLICK_TRIGGER__">
           <button class="btn" onclick="setKey('Click')">Set Key</button>
         </div>
-        <div class="row">
-          <label>Control Name:</label>
-          <input type="text" id="ClickControlNameInput" value="__CLICK_CONTROL__">
-        </div>
         <div class="status" id="ClickStatusText">__STATUS_CLICK__</div>
       </div>
 
@@ -579,6 +637,13 @@
           <label>Join Message:</label>
           <input type="text" class="wide" id="JoinMessageInput" value="__JOIN_MESSAGE__" oninput="nav('ahk://setjoinmessage?value=' + enc(this.value))">
         </div>
+        <div class="row">
+          <label>Quick join + prev:</label>
+          <label class="switch">
+            <input type="checkbox" id="JoinQuick_toggle" onclick="nav('ahk://togglejoinquick')" __CHK_JOIN_QUICK__>
+            <span class="slider"></span>
+          </label>
+        </div>
         <div class="status" id="JoinStatusText">__STATUS_JOIN__</div>
       </div>
 
@@ -620,7 +685,28 @@
 <script>
 function val(id) { return document.getElementById(id).value; }
 function enc(s) { return encodeURIComponent(s).replace(/%20/g, '+'); }
-function nav(url) { document.title = url; }
+
+/* Every button/input in this page calls nav('ahk://action?k=v&k2=v2') -
+   that scheme name is a holdover from the AHK version (which watched for
+   ahk:// "navigations"/title changes). Here it's just parsed client-side
+   and forwarded straight to the Python side via pywebview's JS bridge. */
+function nav(url) {
+  var path = url.replace('ahk://', '');
+  var qIdx = path.indexOf('?');
+  var action = qIdx >= 0 ? path.substring(0, qIdx) : path;
+  var query = qIdx >= 0 ? path.substring(qIdx + 1) : '';
+  var params = {};
+  if (query) {
+    query.split('&').forEach(function (pair) {
+      if (!pair) return;
+      var eq = pair.indexOf('=');
+      var k = eq >= 0 ? pair.substring(0, eq) : pair;
+      var v = eq >= 0 ? pair.substring(eq + 1).replace(/\+/g, ' ') : '';
+      params[decodeURIComponent(k)] = decodeURIComponent(v);
+    });
+  }
+  window.pywebview.api.handle_command(action, params);
+}
 
 function setKey(target) {
   nav('ahk://setkey?target=' + target);
@@ -643,7 +729,6 @@ function saveSettings() {
     '&spamkey=' + enc(val('SpamKeyInput')) +
     '&spamdelay=' + enc(val('SpamDelayInput')) +
     '&clicktrigger=' + enc(val('ClickTriggerKeyInput')) +
-    '&clickcontrol=' + enc(val('ClickControlNameInput')) +
     '&rolltrigger=' + enc(val('RollTriggerKeyInput')) +
     '&rollparrytrigger=' + enc(val('RollParryTriggerKeyInput')) +
     '&shfeinttrigger=' + enc(val('SHFeintTriggerKeyInput')) +
@@ -715,6 +800,57 @@ function syncToggleSubtitles() {
 
 syncToggleSubtitles();
 setInterval(syncToggleSubtitles, 500);
+
+/* ===== Drain queued DOM updates from Python's background threads =====
+   Python never pokes the DOM directly from a background thread anymore
+   (screenshot loop, hotkey-capture thread, macro loops) - it just queues
+   plain data via _push_update() and this polls it out through the normal
+   pywebview.api bridge, same path user-triggered nav() calls already use
+   safely. */
+function applyUpdate(u) {
+  var el;
+  switch (u.type) {
+    case 'set_val':
+      el = document.getElementById(u.id);
+      if (el) el.value = u.value;
+      break;
+    case 'set_html':
+      el = document.getElementById(u.id);
+      if (el) el.innerText = u.text;
+      break;
+    case 'set_checked':
+      el = document.getElementById(u.id);
+      if (el) el.checked = u.state;
+      break;
+    case 'set_capturing':
+      setCapturing(u.state);
+      break;
+    case 'screenshot':
+      el = document.getElementById('ServerScreenshotImg');
+      if (el) el.src = u.url;
+      break;
+    case 'update_available':
+      el = document.getElementById('UpdateBannerText');
+      if (el) el.innerText = 'Update available: ' + u.version + ' (you have ' + u.current + ').';
+      el = document.getElementById('UpdateBanner');
+      if (el) el.style.display = 'flex';
+      break;
+    case 'update_result':
+      el = document.getElementById('UpdateBannerText');
+      if (el) el.innerText = u.message;
+      el = document.getElementById('UpdateBanner');
+      if (el) el.style.display = 'flex';
+      break;
+  }
+}
+
+function pollUpdates() {
+  if (!window.pywebview || !window.pywebview.api) return;
+  window.pywebview.api.pop_updates().then(function (updates) {
+    for (var i = 0; i < updates.length; i++) applyUpdate(updates[i]);
+  }).catch(function () { /* window closing / bridge not ready yet - ignore */ });
+}
+setInterval(pollUpdates, 150);
 
 /* ===== Add Script - visual only for now, not wired to AHK yet ===== */
 var pendingCount = 0;
