@@ -4,6 +4,6 @@ pywin32>=306
 Pillow>=10.0
 psutil>=5.9
 
-# Also requires AutoHotkey v1.1 (classic syntax) installed on the machine,
+# Also requires AutoHotkey v2 installed on the machine,
 # or set the AHK_EXE env var to point at AutoHotkey.exe / a compiled .exe.
 # See app/ahk_bridge.py and ahk/macro_worker.ahk.

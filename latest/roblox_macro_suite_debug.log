@@ -1,0 +1,159 @@
+2026-07-22T00:02:19.466  [main]  app starting
+2026-07-22T00:02:19.469  [main]  not admin - relaunching elevated
+2026-07-22T00:02:21.089  [main]  app starting
+2026-07-22T00:02:21.103  [settings]  load_settings: loaded from C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\settings.json
+2026-07-22T00:02:21.104  [ahk_bridge]  starting worker: AHK_EXE=C:\Program Files\AutoHotkey\AutoHotkey.exe WORKER_SCRIPT=C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\ahk\macro_worker.ahk
+2026-07-22T00:02:21.161  [ahk_bridge]  FAILED: worker exited immediately, code=2
+2026-07-22T00:02:21.163  [ahk_bridge]  AHK error output:
+C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\ahk\macro_worker.ahk (1) : ==> This script requires AutoHotkey v2.0.
+
+Current interpreter: AutoHotkey v1.1.37.02 Unicode 64-bit
+C:\Program Files\AutoHotkey\AutoHotkey.exe
+2026-07-22T00:02:21.165  [main]  UNCAUGHT EXCEPTION (main thread):
+Traceback (most recent call last):
+  File "C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\main.py", line 84, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\main.py", line 56, in main
+    ahk_bridge.ensure_worker_running()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\app\ahk_bridge.py", line 224, in ensure_worker_running
+    raise RuntimeError(
+    ...<2 lines>...
+    )
+RuntimeError: macro_worker.ahk exited immediately (code 2). AutoHotkey reported an error (see above/log) - likely a real syntax problem in macro_worker.ahk. Full log: C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\roblox_macro_suite_debug.log
+
+2026-07-22T00:03:42.155  [main]  app starting
+2026-07-22T00:03:42.158  [main]  not admin - relaunching elevated
+2026-07-22T00:03:43.823  [main]  app starting
+2026-07-22T00:03:43.826  [settings]  load_settings: loaded from C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\settings.json
+2026-07-22T00:03:43.826  [ahk_bridge]  starting worker: AHK_EXE=C:\Program Files\AutoHotkey\AutoHotkey.exe WORKER_SCRIPT=C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\ahk\macro_worker.ahk
+2026-07-22T00:03:43.883  [ahk_bridge]  FAILED: worker exited immediately, code=2
+2026-07-22T00:03:43.883  [ahk_bridge]  AHK error output:
+C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\ahk\macro_worker.ahk (1) : ==> This script requires AutoHotkey v2.0.
+
+Current interpreter: AutoHotkey v1.1.37.02 Unicode 64-bit
+C:\Program Files\AutoHotkey\AutoHotkey.exe
+2026-07-22T00:03:43.885  [main]  UNCAUGHT EXCEPTION (main thread):
+Traceback (most recent call last):
+  File "C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\main.py", line 84, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\main.py", line 56, in main
+    ahk_bridge.ensure_worker_running()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\app\ahk_bridge.py", line 224, in ensure_worker_running
+    raise RuntimeError(
+    ...<2 lines>...
+    )
+RuntimeError: macro_worker.ahk exited immediately (code 2). AutoHotkey reported an error (see above/log) - likely a real syntax problem in macro_worker.ahk. Full log: C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\roblox_macro_suite_debug.log
+
+2026-07-22T00:05:31.460  [main]  app starting
+2026-07-22T00:05:31.462  [main]  not admin - relaunching elevated
+2026-07-22T00:05:33.036  [main]  app starting
+2026-07-22T00:05:33.038  [settings]  load_settings: loaded from C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\settings.json
+2026-07-22T00:05:33.039  [ahk_bridge]  starting worker: AHK_EXE=C:\Program Files\AutoHotkey\AutoHotkey.exe WORKER_SCRIPT=C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\ahk\macro_worker.ahk
+2026-07-22T00:05:33.096  [ahk_bridge]  FAILED: worker exited immediately, code=2
+2026-07-22T00:05:33.096  [ahk_bridge]  AHK error output:
+C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\ahk\macro_worker.ahk (1) : ==> This script requires AutoHotkey v2.0.
+
+Current interpreter: AutoHotkey v1.1.37.02 Unicode 64-bit
+C:\Program Files\AutoHotkey\AutoHotkey.exe
+2026-07-22T00:05:33.098  [main]  UNCAUGHT EXCEPTION (main thread):
+Traceback (most recent call last):
+  File "C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\main.py", line 84, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\main.py", line 56, in main
+    ahk_bridge.ensure_worker_running()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\app\ahk_bridge.py", line 224, in ensure_worker_running
+    raise RuntimeError(
+    ...<2 lines>...
+    )
+RuntimeError: macro_worker.ahk exited immediately (code 2). AutoHotkey reported an error (see above/log) - likely a real syntax problem in macro_worker.ahk. Full log: C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\roblox_macro_suite_debug.log
+
+2026-07-22T00:09:52.981  [main]  app starting
+2026-07-22T00:09:52.983  [main]  not admin - relaunching elevated
+2026-07-22T00:09:54.621  [main]  app starting
+2026-07-22T00:09:54.631  [settings]  load_settings: loaded from C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\settings.json
+2026-07-22T00:09:54.632  [ahk_bridge]  starting worker: AHK_EXE=C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe WORKER_SCRIPT=C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\ahk\macro_worker.ahk
+2026-07-22 00:09:54  [macro_worker.ahk]  worker starting, pid=4908
+2026-07-22T00:09:55.469  [gui]  on_window_created: rebinding hotkeys and starting screenshot loop
+2026-07-22T00:09:55.470  [screenshot]  set_enabled(True)
+2026-07-22T00:09:55.471  [screenshot]  start (polling C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\server_capture.png)
+2026-07-22T00:09:55.913  [updater]  check_for_update: update available, local='dev' remote='2026-07-21-2313', 18 files
+2026-07-22T00:10:02.819  [gui]  handle_command(action='toggle', params={'macro': 'MFeint'})
+2026-07-22T00:10:02.820  [settings]  save_settings: wrote C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\settings.json
+2026-07-22T00:10:02.946  [hotkeys]  bind_oneshot(MFeint, key='l') OK
+2026-07-22T00:10:39.498  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:10:39.502  [macros]  macro_m_feint
+2026-07-22T00:10:39.503  [ahk_bridge]  send_command: m_feint
+2026-07-22T00:10:42.351  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:10:42.352  [macros]  macro_m_feint
+2026-07-22T00:10:42.352  [ahk_bridge]  send_command: m_feint
+2026-07-22T00:10:45.491  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:10:45.492  [macros]  macro_m_feint
+2026-07-22T00:10:45.492  [ahk_bridge]  send_command: m_feint
+2026-07-22T00:10:47.285  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:10:47.285  [macros]  macro_m_feint
+2026-07-22T00:10:47.286  [ahk_bridge]  send_command: m_feint
+2026-07-22T00:10:53.821  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:10:53.822  [macros]  macro_m_feint
+2026-07-22T00:10:53.822  [ahk_bridge]  send_command: m_feint
+2026-07-22T00:10:55.546  [screenshot]  capture changed (first=True, hash=e879a941)
+2026-07-22T00:11:08.583  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:11:08.584  [macros]  macro_m_feint
+2026-07-22T00:11:08.584  [ahk_bridge]  send_command: m_feint
+2026-07-22T00:11:13.801  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:11:13.802  [macros]  macro_m_feint
+2026-07-22T00:11:13.802  [ahk_bridge]  send_command: m_feint
+2026-07-22T00:11:15.425  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:11:15.426  [macros]  macro_m_feint
+2026-07-22T00:11:15.426  [ahk_bridge]  send_command: m_feint
+2026-07-22T00:11:22.662  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:11:22.663  [macros]  macro_m_feint
+2026-07-22T00:11:22.663  [ahk_bridge]  send_command: m_feint
+2026-07-22T00:13:54.851  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:13:54.852  [gui]  _guarded: skipped macro_m_feint - Roblox not focused
+2026-07-22T00:13:54.995  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:13:54.995  [gui]  _guarded: skipped macro_m_feint - Roblox not focused
+2026-07-22T00:13:55.995  [hotkeys]  oneshot fired: MFeint (key='l')
+2026-07-22T00:13:55.995  [gui]  _guarded: skipped macro_m_feint - Roblox not focused
+2026-07-22T00:13:58.394  [main]  webview.start() returned normally (window closed)
+2026-07-22T00:13:58.395  [main]  app exiting - stopping AHK worker
+2026-07-22T00:13:58.397  [ahk_bridge]  stop_worker called
+2026-07-22T00:23:31.736  [main]  app starting
+2026-07-22T00:23:31.739  [main]  not admin - relaunching elevated
+2026-07-22T00:23:33.621  [main]  app starting
+2026-07-22T00:23:33.636  [settings]  load_settings: loaded from C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\settings.json
+2026-07-22T00:23:33.637  [ahk_bridge]  starting worker: AHK_EXE=C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe WORKER_SCRIPT=C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\ahk\macro_worker.ahk
+2026-07-22T00:23:33.695  [ahk_bridge]  worker running OK, pid=9212 hwnd=6882998
+2026-07-22T00:23:33.697  [settings]  load_settings: loaded from C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\settings.json
+2026-07-22 00:23:33  [macro_worker.ahk]  worker starting, pid=9212
+2026-07-22T00:23:34.281  [gui]  on_window_created: rebinding hotkeys and starting screenshot loop
+2026-07-22T00:23:34.551  [hotkeys]  bind_oneshot(MFeint, key='l') OK
+2026-07-22T00:23:34.552  [screenshot]  set_enabled(True)
+2026-07-22T00:23:34.553  [screenshot]  start (polling C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\server_capture.png)
+2026-07-22T00:23:34.955  [updater]  check_for_update: update available, local='dev' remote='2026-07-21-2313', 18 files
+2026-07-22T00:23:36.742  [gui]  handle_command(action='startdrag', params={})
+2026-07-22T00:23:37.641  [gui]  handle_command(action='exit', params={})
+2026-07-22T00:23:37.695  [main]  webview.start() returned normally (window closed)
+2026-07-22T00:23:37.696  [main]  app exiting - stopping AHK worker
+2026-07-22T00:23:37.697  [ahk_bridge]  stop_worker called
+2026-07-22T00:30:24.619  [main]  app starting
+2026-07-22T00:30:24.621  [main]  not admin - relaunching elevated
+2026-07-22T00:30:26.592  [main]  app starting
+2026-07-22T00:30:26.596  [settings]  load_settings: loaded from C:\Users\weldr\Downloads\MacroV2_patched_ahkv2\MacroV2_patched_ahkv2\roblox_macro_suite\settings.json
+2026-07-22T00:30:26.597  [ahk_bridge]  starting worker: AHK_EXE=C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe WORKER_SCRIPT=C:\Users\weldr\Downloads\MacroV2_patched_ahkv2\MacroV2_patched_ahkv2\roblox_macro_suite\ahk\macro_worker.ahk
+2026-07-22 00:30:26  [macro_worker.ahk]  worker starting, pid=25492
+2026-07-22T00:30:27.881  [gui]  on_window_created: rebinding hotkeys and starting screenshot loop
+2026-07-22T00:30:28.157  [hotkeys]  bind_oneshot(MFeint, key='l') OK
+2026-07-22T00:30:28.157  [screenshot]  set_enabled(True)
+2026-07-22T00:30:28.158  [screenshot]  start (polling C:\Users\weldr\Downloads\MacroV2_patched_ahkv2\MacroV2_patched_ahkv2\roblox_macro_suite\server_capture.png)
+2026-07-22T00:30:28.942  [updater]  check_for_update: update available, local='dev' remote='2026-07-21-2313', 18 files
+2026-07-22T00:30:35.435  [gui]  handle_command(action='startdrag', params={})
+2026-07-22T00:31:14.200  [gui]  handle_command(action='exit', params={})
+2026-07-22T00:31:14.262  [main]  webview.start() returned normally (window closed)
+2026-07-22T00:31:14.264  [main]  app exiting - stopping AHK worker
+2026-07-22T00:31:14.264  [ahk_bridge]  stop_worker called

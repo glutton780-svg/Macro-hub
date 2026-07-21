@@ -6,11 +6,11 @@ Python keeps doing everything it's good at (GUI, settings, global hotkey
 module hands off to AHK is the actual input-sending primitive - the part
 that was breaking when ported to pynput/keyboard.
 
-Requires AutoHotkey v1.1 (the classic/non-v2 syntax used in macro_worker.ahk)
-to be installed. If you have AutoHotkey v2 installed instead, this will
-fail: v2 can't run v1 syntax. Get v1.1 specifically from
-https://www.autohotkey.com/download/ahk-install.exe (the main download
-page defaults to v2 - look for the "other versions" / v1.1 link).
+Requires AutoHotkey v2 (the syntax used in macro_worker.ahk) to be
+installed. If you only have AutoHotkey v1.1 installed instead, this will
+fail: v1.1 can't run v2 syntax. Grab the current installer from
+https://www.autohotkey.com/ - the main download page installs v2 by
+default.
 
 DEBUGGING: every start attempt, exit code, and any error text AHK reports
 is appended to the shared app log (see app/applog.py) - by default
@@ -22,13 +22,27 @@ import os
 import subprocess
 import sys
 import time
+import tkinter as tk
+from tkinter import filedialog, messagebox
 
 import win32gui
 import win32process
 
 from . import applog
+from . import settings as app_settings
 
-AHK_EXE = os.environ.get("AHK_EXE", r"C:\Program Files\AutoHotkey\AutoHotkey.exe")
+# Common install locations checked (in order) before we ever bother the
+# user with a dialog.
+_DEFAULT_CANDIDATES = [
+    r"C:\Program Files\AutoHotkey\AutoHotkey.exe",
+    r"C:\Program Files (x86)\AutoHotkey\AutoHotkey.exe",
+]
+
+# Kept for anything that still reads the module-level constant (e.g. log
+# messages) - _resolve_ahk_exe() is what actually decides the real path
+# used to launch the worker, and it re-checks env var / saved override /
+# defaults fresh every call.
+AHK_EXE = os.environ.get("AHK_EXE", _DEFAULT_CANDIDATES[0])
 
 if getattr(sys, "frozen", False):
     # Running from a PyInstaller-built exe - files added via --add-data in
@@ -82,6 +96,58 @@ def _hwnd_is_alive(hwnd):
     return bool(hwnd) and win32gui.IsWindow(hwnd)
 
 
+def _resolve_ahk_exe():
+    """Figures out where AutoHotkey.exe actually is, checking (in order):
+    the AHK_EXE env var, a path the user previously browsed to (saved in
+    settings.json), then the usual install locations. Returns None if none
+    of those exist."""
+    env_path = os.environ.get("AHK_EXE")
+    if env_path and os.path.exists(env_path):
+        return env_path
+
+    saved = app_settings.load_settings().get("ahk_exe_path", "")
+    if saved and os.path.exists(saved):
+        return saved
+
+    for candidate in _DEFAULT_CANDIDATES:
+        if os.path.exists(candidate):
+            return candidate
+
+    return None
+
+
+def _prompt_for_ahk_exe():
+    """Pops up a small dialog asking the user to browse to AutoHotkey.exe
+    themselves. Returns the chosen path, or None if they cancelled/declined."""
+    root = tk.Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+
+    proceed = messagebox.askyesno(
+        "AutoHotkey not found",
+        "Couldn't find AutoHotkey.exe in the usual install locations.\n\n"
+        "Do you want to browse to it yourself?",
+        parent=root,
+    )
+
+    chosen = None
+    if proceed:
+        picked = filedialog.askopenfilename(
+            title="Locate AutoHotkey.exe",
+            filetypes=[
+                ("AutoHotkey executable", "AutoHotkey.exe"),
+                ("Executable files", "*.exe"),
+                ("All files", "*.*"),
+            ],
+            parent=root,
+        )
+        if picked:
+            chosen = picked
+
+    root.destroy()
+    return chosen
+
+
 def ensure_worker_running(timeout=3.0):
     """Starts macro_worker.ahk if it isn't already running. Call once at
     app startup (e.g. from main.py before the window opens)."""
@@ -90,15 +156,28 @@ def ensure_worker_running(timeout=3.0):
     if _hwnd_is_alive(_worker_hwnd):
         return
 
-    _log(f"starting worker: AHK_EXE={AHK_EXE} WORKER_SCRIPT={WORKER_SCRIPT}")
+    ahk_exe = _resolve_ahk_exe()
 
-    if not os.path.exists(AHK_EXE):
-        _log("FAILED: AutoHotkey.exe not found at that path")
-        raise RuntimeError(
-            f"AutoHotkey.exe not found at {AHK_EXE}. Install AutoHotkey "
-            "v1.1, or set the AHK_EXE environment variable to its actual "
-            f"location. (See {DEBUG_LOG_FILE} for the debug log.)"
-        )
+    if not ahk_exe:
+        _log("AutoHotkey.exe not found in env var, saved settings, or defaults - prompting user")
+        picked = _prompt_for_ahk_exe()
+        if picked and os.path.exists(picked):
+            ahk_exe = picked
+            # Remember the choice so we don't have to ask again next launch.
+            current = app_settings.load_settings()
+            current["ahk_exe_path"] = ahk_exe
+            app_settings.save_settings(current)
+            _log(f"user selected AHK_EXE={ahk_exe} (saved to settings.json)")
+        else:
+            _log("FAILED: user did not provide a valid AutoHotkey.exe path")
+            raise RuntimeError(
+                "AutoHotkey.exe not found. Install AutoHotkey v2, set the "
+                "AHK_EXE environment variable to its actual location, or "
+                "re-launch the app and use the browse dialog to point it "
+                f"there. (See {DEBUG_LOG_FILE} for the debug log.)"
+            )
+
+    _log(f"starting worker: AHK_EXE={ahk_exe} WORKER_SCRIPT={WORKER_SCRIPT}")
 
     if not os.path.exists(WORKER_SCRIPT):
         _log("FAILED: macro_worker.ahk not found")
@@ -109,7 +188,7 @@ def ensure_worker_running(timeout=3.0):
             f"(See {DEBUG_LOG_FILE} for the debug log.)"
         )
 
-    # /ErrorStdOut makes AHK v1.1 write load-time/runtime error text to
+    # /ErrorStdOut makes AHK write load-time/runtime error text to
     # stdout instead of a popup dialog, so we can actually capture *why*
     # it died instead of just seeing an exit code.
     #
@@ -117,7 +196,7 @@ def ensure_worker_running(timeout=3.0):
     # macro_worker.ahk), [2]=the shared log file path (so both sides write
     # to the exact same file next to the app instead of guessing at it).
     _worker_proc = subprocess.Popen(
-        [AHK_EXE, "/ErrorStdOut", os.path.abspath(WORKER_SCRIPT),
+        [ahk_exe, "/ErrorStdOut", os.path.abspath(WORKER_SCRIPT),
          str(os.getpid()), applog.LOG_FILE],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -138,10 +217,9 @@ def ensure_worker_running(timeout=3.0):
                 if output
                 else
                 "No error text was captured, which usually means AutoHotkey "
-                "v2 is installed instead of v1.1 (v2 doesn't support "
-                "/ErrorStdOut the same way and shows its own popup for v1 "
-                "syntax it can't parse - check for a stray AutoHotkey "
-                "dialog on screen/taskbar)."
+                "v1.1 is installed instead of v2 (v1.1 shows its own popup "
+                "for v2 syntax it can't parse instead of writing to stdout "
+                "- check for a stray AutoHotkey dialog on screen/taskbar)."
             )
             raise RuntimeError(
                 f"macro_worker.ahk exited immediately (code {exit_code}). "
@@ -157,7 +235,7 @@ def ensure_worker_running(timeout=3.0):
     _log("FAILED: worker process alive but no window appeared before timeout")
     raise RuntimeError(
         "macro_worker.ahk started but its window never appeared in time. "
-        f"AHK_EXE={AHK_EXE}  Full log: {DEBUG_LOG_FILE}"
+        f"AHK_EXE={ahk_exe}  Full log: {DEBUG_LOG_FILE}"
     )
 
 

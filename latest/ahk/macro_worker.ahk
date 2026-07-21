@@ -1,4 +1,5 @@
-; macro_worker.ahk
+#Requires AutoHotkey v2.0
+; macro_worker.ahk (AutoHotkey v2 port)
 ;
 ; A tiny, persistent AHK helper. It does NOT know about "Roll Uppercut" or
 ; "Server Join" - it only knows how to execute one primitive input command
@@ -12,21 +13,24 @@
 ; synchronous and sub-millisecond, so your existing time.sleep() calls
 ; between steps still control the real timing - this is not a "spawn a new
 ; process per keypress" design.
+;
+; Same command protocol as the v1.1 script - ahk_bridge.py does not need
+; any changes. The script has no #Persistent directive because v2 dropped
+; it: a script that registers OnMessage/SetTimer callbacks (as this one
+; does) stays resident automatically without one.
 
-#SingleInstance, Force
-#Persistent
-SetBatchLines, -1
-SendMode, Input          ; matches AHK's fast/reliable default Send mode
+#SingleInstance Force
+SendMode "Input"           ; matches AHK's fast/reliable default Send mode
 
 ; Log file path is passed in as the 2nd script arg (see ahk_bridge.py) so
 ; both sides write to the exact same file, next to the app. Falls back to
 ; a sensible default if launched standalone for testing.
-LogFile := A_Args.Length() >= 2 ? A_Args[2] : A_ScriptDir . "\..\roblox_macro_suite_debug.log"
+LogFile := A_Args.Length >= 2 ? A_Args[2] : A_ScriptDir . "\..\roblox_macro_suite_debug.log"
 
 LogMsg(msg) {
     global LogFile
-    FormatTime, ts,, yyyy-MM-dd HH:mm:ss
-    FileAppend, %ts%  [macro_worker.ahk]  %msg%`n, %LogFile%
+    ts := FormatTime(, "yyyy-MM-dd HH:mm:ss")
+    FileAppend(ts . "  [macro_worker.ahk]  " . msg . "`n", LogFile)
 }
 
 LogMsg("worker starting, pid=" . DllCall("GetCurrentProcessId"))
@@ -34,10 +38,9 @@ LogMsg("worker starting, pid=" . DllCall("GetCurrentProcessId"))
 ; No hwnd handshake needed here - every AHK script has an automatically
 ; created main window (hidden by default) as soon as it's running. Python
 ; finds it by matching this process's PID via EnumWindows, so there's
-; nothing version-specific (like A_ScriptHwnd, added only in newer v1.1
-; builds) for this script to depend on.
+; nothing version-specific for this script to depend on.
 
-OnMessage(0x4a, "ReceiveCopyData")  ; WM_COPYDATA
+OnMessage(0x4A, ReceiveCopyData)  ; WM_COPYDATA
 
 ; ----- Watchdog: exit if the Python app disappears -----
 ; ahk_bridge.py normally kills us cleanly via stop_worker() on exit, but
@@ -47,21 +50,23 @@ OnMessage(0x4a, "ReceiveCopyData")  ; WM_COPYDATA
 ; send input to Roblox with nothing driving it. So: Python passes its own
 ; PID as the 1st script arg, and we poll every 2s to make sure it's still
 ; alive; if not, we exit ourselves.
-ParentPID := A_Args.Length() >= 1 ? A_Args[1] : 0
+ParentPID := A_Args.Length >= 1 ? A_Args[1] : 0
 if (ParentPID)
-    SetTimer, CheckParentAlive, 2000
-return
+    SetTimer(CheckParentAlive, 2000)
 
-CheckParentAlive:
-    Process, Exist, %ParentPID%
-    if (ErrorLevel = 0) {
+CheckParentAlive() {
+    global ParentPID
+    if !ProcessExist(ParentPID) {
         LogMsg("parent process (pid=" . ParentPID . ") gone - exiting")
-        ExitApp
+        ExitApp()
     }
-return
+}
 
-ReceiveCopyData(wParam, lParam) {
-    StringAddress := NumGet(lParam + 2 * A_PtrSize)
+ReceiveCopyData(wParam, lParam, msg, hwnd) {
+    ; COPYDATASTRUCT: dwData (ptr), cbData (uint, ptr-aligned), lpData (ptr)
+    ; - same offset math as the v1 version, just using NumGet's explicit
+    ; type param instead of v1's implicit default.
+    StringAddress := NumGet(lParam, 2 * A_PtrSize, "UPtr")
     cmd := StrGet(StringAddress, "UTF-8")
     HandleCommand(cmd)
     return true
@@ -73,35 +78,38 @@ HandleCommand(cmd) {
     action := parts[1]
 
     if (action = "send_key") {
-        Send, % "{" . parts[2] . "}"
+        Send("{" . parts[2] . "}")
 
     } else if (action = "key_down") {
-        Send, % "{" . parts[2] . " down}"
+        Send("{" . parts[2] . " down}")
 
     } else if (action = "key_up") {
-        Send, % "{" . parts[2] . " up}"
+        Send("{" . parts[2] . " up}")
 
     } else if (action = "click") {
         ; click at current cursor position, matches AHK `Click, Right`
-        Click, % parts[2]
+        Click(parts[2])
 
     } else if (action = "mouse_down") {
-        Click, % parts[2] . " down"
+        Click(parts[2] . " down")
 
     } else if (action = "mouse_up") {
-        Click, % parts[2] . " up"
+        Click(parts[2] . " up")
 
     } else if (action = "move_mouse") {
-        MouseMove, % parts[2], % parts[3], 0
+        MouseMove(parts[2], parts[3], 0)
 
     } else if (action = "control_click") {
         ; ControlName, WinTitle (WinTitle optional - defaults to Roblox)
-        target_win := (parts.Length() >= 3 && parts[3] != "") ? parts[3] : "ahk_exe RobloxPlayerBeta.exe"
-        ControlClick, % parts[2], % target_win
-        if (ErrorLevel)
-            LogMsg("control_click FAILED - control [" . parts[2] . "] or window [" . target_win . "] not found")
-        else
+        target_win := (parts.Length >= 3 && parts[3] != "") ? parts[3] : "ahk_exe RobloxPlayerBeta.exe"
+        ; v2 has no ErrorLevel for this - ControlClick throws instead, so
+        ; the success/failure log messages move into a try/catch.
+        try {
+            ControlClick(parts[2], target_win)
             LogMsg("control_click OK - clicked [" . parts[2] . "] in [" . target_win . "]")
+        } catch as err {
+            LogMsg("control_click FAILED - control [" . parts[2] . "] or window [" . target_win . "] not found (" . err.Message . ")")
+        }
 
     } else if (action = "m_feint") {
         ; Runs the ENTIRE original MFeint sequence natively inside AHK,
@@ -113,23 +121,21 @@ HandleCommand(cmd) {
         ; (~10ms KeyDelay/MouseDelay - never overridden in this script)
         ; just for this one sequence, then restore Input mode afterward
         ; so nothing else is affected.
-        SendMode, Event
-        Send {RButton}
-        Send {q}
-        Click
-        Send {RButton}
-        SendMode, Input
+        SendMode "Event"
+        Send "{RButton}"
+        Send "{q}"
+        Click()
+        Send "{RButton}"
+        SendMode "Input"
 
     } else if (action = "send_text") {
         ; {Text} mode - literal Unicode injection, bypasses VK_SPACE hooks
         ; (this is the exact mechanism the original join-message macro used)
-        SendInput, % "{Text}" . parts[2]
+        SendInput("{Text}" . parts[2])
 
     } else if (action = "join_start") {
         ; parts: msgboxX|msgboxY|sendX|sendY|joinX|joinY|rejoinX|rejoinY|quickFlag|message
-        ; Ported directly from the standalone GUI.ahk's ServerJoinMacro /
-        ; JN_ToggleTick labels, so it reproduces the original's real
-        ; click/type/rejoin timing exactly instead of Python round-trips.
+        global JN_Active, JN_JoinBtnX, JN_JoinBtnY, JN_RejoinBtnX, JN_RejoinBtnY, JN_QuickMode
         JN_MsgBoxX := parts[2], JN_MsgBoxY := parts[3]
         JN_SendBtnX := parts[4], JN_SendBtnY := parts[5]
         JN_JoinBtnX := parts[6], JN_JoinBtnY := parts[7]
@@ -143,36 +149,39 @@ HandleCommand(cmd) {
 
         JN_Active := true
 
-        MouseMove, % JN_MsgBoxX, % JN_MsgBoxY, 5
-        Click
-        Click
-        Sleep, 100
+        MouseMove(JN_MsgBoxX, JN_MsgBoxY, 5)
+        Click()
+        Click()
+        Sleep(100)
 
-        SendInput, % "{Text}" . JN_Message
+        SendInput("{Text}" . JN_Message)
 
-        MouseMove, % JN_SendBtnX, % JN_SendBtnY, 5
-        Click
-        Sleep, 200
-        MouseMove, % JN_JoinBtnX, % JN_JoinBtnY, 5
-        Click
+        MouseMove(JN_SendBtnX, JN_SendBtnY, 5)
+        Click()
+        Sleep(200)
+        MouseMove(JN_JoinBtnX, JN_JoinBtnY, 5)
+        Click()
 
-        SetTimer, JN_ToggleTick, -10
+        SetTimer(JN_ToggleTick, -10)
 
     } else if (action = "join_stop") {
+        global JN_Active, JN_QuickMode
         JN_Active := false
         JN_QuickMode := false
-        SetTimer, JN_ToggleTick, Off
+        SetTimer(JN_ToggleTick, 0)
 
     } else if (action = "prev_start") {
         ; parts: prevX|prevY|joinX|joinY
+        global PN_Active, PN_PrevBtnX, PN_PrevBtnY, PN_JoinBtnX, PN_JoinBtnY
         PN_PrevBtnX := parts[2], PN_PrevBtnY := parts[3]
         PN_JoinBtnX := parts[4], PN_JoinBtnY := parts[5]
         PN_Active := true
-        SetTimer, PN_ToggleTick, -10
+        SetTimer(PN_ToggleTick, -10)
 
     } else if (action = "prev_stop") {
+        global PN_Active
         PN_Active := false
-        SetTimer, PN_ToggleTick, Off
+        SetTimer(PN_ToggleTick, 0)
 
     } else {
         LogMsg("unknown command: " . cmd)
@@ -187,26 +196,27 @@ JN_RejoinBtnX := 0
 JN_RejoinBtnY := 0
 JN_QuickMode := false
 
-JN_ToggleTick:
+JN_ToggleTick() {
+    global JN_Active, JN_RejoinBtnX, JN_RejoinBtnY, JN_QuickMode, JN_JoinBtnX, JN_JoinBtnY
     if (!JN_Active)
         return
 
-    MouseMove, % JN_RejoinBtnX, % JN_RejoinBtnY, 5
-    Click
+    MouseMove(JN_RejoinBtnX, JN_RejoinBtnY, 5)
+    Click()
     ; Quick join + prev clicks the real Previous Server button, which
     ; needs a double-click to register (see PN_ToggleTick) - the normal
     ; rejoin-box button only needs one.
     if (JN_QuickMode)
-        Click
-    Sleep, 200
+        Click()
+    Sleep(200)
 
-    MouseMove, % JN_JoinBtnX, % JN_JoinBtnY, 5
-    Click
-    Sleep, 200
+    MouseMove(JN_JoinBtnX, JN_JoinBtnY, 5)
+    Click()
+    Sleep(200)
 
     if (JN_Active)
-        SetTimer, JN_ToggleTick, -10
-return
+        SetTimer(JN_ToggleTick, -10)
+}
 
 ; ----- Previous Server loop (native AHK, matches original PN_ToggleTick) -----
 PN_Active := false
@@ -215,19 +225,20 @@ PN_PrevBtnY := 0
 PN_JoinBtnX := 0
 PN_JoinBtnY := 0
 
-PN_ToggleTick:
+PN_ToggleTick() {
+    global PN_Active, PN_PrevBtnX, PN_PrevBtnY, PN_JoinBtnX, PN_JoinBtnY
     if (!PN_Active)
         return
 
-    MouseMove, % PN_PrevBtnX, % PN_PrevBtnY, 5
-    Click
-    Click
-    Sleep, 200
+    MouseMove(PN_PrevBtnX, PN_PrevBtnY, 5)
+    Click()
+    Click()
+    Sleep(200)
 
-    MouseMove, % PN_JoinBtnX, % PN_JoinBtnY, 5
-    Click
-    Sleep, 200
+    MouseMove(PN_JoinBtnX, PN_JoinBtnY, 5)
+    Click()
+    Sleep(200)
 
     if (PN_Active)
-        SetTimer, PN_ToggleTick, -10
-return
+        SetTimer(PN_ToggleTick, -10)
+}
