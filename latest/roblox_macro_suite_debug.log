@@ -141,19 +141,20 @@ RuntimeError: macro_worker.ahk exited immediately (code 2). AutoHotkey reported 
 2026-07-22T00:23:37.695  [main]  webview.start() returned normally (window closed)
 2026-07-22T00:23:37.696  [main]  app exiting - stopping AHK worker
 2026-07-22T00:23:37.697  [ahk_bridge]  stop_worker called
-2026-07-22T00:30:24.619  [main]  app starting
-2026-07-22T00:30:24.621  [main]  not admin - relaunching elevated
-2026-07-22T00:30:26.592  [main]  app starting
-2026-07-22T00:30:26.596  [settings]  load_settings: loaded from C:\Users\weldr\Downloads\MacroV2_patched_ahkv2\MacroV2_patched_ahkv2\roblox_macro_suite\settings.json
-2026-07-22T00:30:26.597  [ahk_bridge]  starting worker: AHK_EXE=C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe WORKER_SCRIPT=C:\Users\weldr\Downloads\MacroV2_patched_ahkv2\MacroV2_patched_ahkv2\roblox_macro_suite\ahk\macro_worker.ahk
-2026-07-22 00:30:26  [macro_worker.ahk]  worker starting, pid=25492
-2026-07-22T00:30:27.881  [gui]  on_window_created: rebinding hotkeys and starting screenshot loop
-2026-07-22T00:30:28.157  [hotkeys]  bind_oneshot(MFeint, key='l') OK
-2026-07-22T00:30:28.157  [screenshot]  set_enabled(True)
-2026-07-22T00:30:28.158  [screenshot]  start (polling C:\Users\weldr\Downloads\MacroV2_patched_ahkv2\MacroV2_patched_ahkv2\roblox_macro_suite\server_capture.png)
-2026-07-22T00:30:28.942  [updater]  check_for_update: update available, local='dev' remote='2026-07-21-2313', 18 files
-2026-07-22T00:30:35.435  [gui]  handle_command(action='startdrag', params={})
-2026-07-22T00:31:14.200  [gui]  handle_command(action='exit', params={})
-2026-07-22T00:31:14.262  [main]  webview.start() returned normally (window closed)
-2026-07-22T00:31:14.264  [main]  app exiting - stopping AHK worker
-2026-07-22T00:31:14.264  [ahk_bridge]  stop_worker called
+2026-07-22T00:25:07.499  [main]  app starting
+2026-07-22T00:25:07.501  [main]  not admin - relaunching elevated
+2026-07-22T00:25:08.997  [main]  app starting
+2026-07-22T00:25:08.999  [settings]  load_settings: loaded from C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\settings.json
+2026-07-22T00:25:08.999  [ahk_bridge]  starting worker: AHK_EXE=C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe WORKER_SCRIPT=C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\ahk\macro_worker.ahk
+2026-07-22 00:25:09  [macro_worker.ahk]  worker starting, pid=22988
+2026-07-22T00:25:09.056  [ahk_bridge]  worker running OK, pid=22988 hwnd=18614664
+2026-07-22T00:25:09.057  [settings]  load_settings: loaded from C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\settings.json
+2026-07-22T00:25:09.655  [gui]  on_window_created: rebinding hotkeys and starting screenshot loop
+2026-07-22T00:25:09.885  [hotkeys]  bind_oneshot(MFeint, key='l') OK
+2026-07-22T00:25:09.886  [screenshot]  set_enabled(True)
+2026-07-22T00:25:09.886  [screenshot]  start (polling C:\Users\ellio\Downloads\MacroV2_patched_ahkv2\roblox_macro_suite\server_capture.png)
+2026-07-22T00:25:10.015  [updater]  check_for_update: update available, local='dev' remote='2026-07-21-2313', 18 files
+2026-07-22T00:25:11.873  [gui]  handle_command(action='exit', params={})
+2026-07-22T00:25:11.923  [main]  webview.start() returned normally (window closed)
+2026-07-22T00:25:11.924  [main]  app exiting - stopping AHK worker
+2026-07-22T00:25:11.924  [ahk_bridge]  stop_worker called
