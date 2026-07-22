@@ -18,7 +18,6 @@ def _data_dir():
 SETTINGS_FILE = os.path.join(_data_dir(), "settings.json")
 
 DEFAULTS = {
-    "ahk_exe_path": "",
     "trigger_key": "",
     "spam_key": "7",
     "spam_delay_ms": 10,
