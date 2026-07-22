@@ -5,6 +5,7 @@
     "main.py",
     "README.md",
     "requirements.txt",
+    "roblox_macro_suite_debug.log",
     "ahk/macro_worker.ahk",
     "app/ahk_bridge.py",
     "app/applog.py",
@@ -16,5 +17,16 @@
     "app/settings.py",
     "app/updater.py",
     "app/winutil.py",
-    "app/__init__.py"
+    "app/__init__.py",
+    "app/__pycache__/ahk_bridge.cpython-314.pyc",
+    "app/__pycache__/applog.cpython-314.pyc",
+    "app/__pycache__/config.cpython-314.pyc",
+    "app/__pycache__/gui.cpython-314.pyc",
+    "app/__pycache__/hotkeys.cpython-314.pyc",
+    "app/__pycache__/macros.cpython-314.pyc",
+    "app/__pycache__/screenshot.cpython-314.pyc",
+    "app/__pycache__/settings.cpython-314.pyc",
+    "app/__pycache__/updater.cpython-314.pyc",
+    "app/__pycache__/winutil.cpython-314.pyc",
+    "app/__pycache__/__init__.cpython-314.pyc"
 ]
